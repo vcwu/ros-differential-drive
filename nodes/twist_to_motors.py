@@ -43,7 +43,6 @@ class TwistToMotors():
         self.pub_rmotor = rospy.Publisher('rwheel_vtarget', Float32)
         rospy.Subscriber('twist', Twist, self.twistCallback)
     
-    
         self.rate = rospy.get_param("~rate", 50)
         self.timeout_ticks = rospy.get_param("~timeout_ticks", 2)
         self.left = 0
@@ -75,8 +74,9 @@ class TwistToMotors():
             
         self.right = 1.0 * self.dx + self.dr * self.w / 2 
         self.left = 1.0 * self.dx - self.dr * self.w / 2
-        # rospy.loginfo("publishing: (%d, %d)", left, right) 
-                
+        #rospy.loginfo("twist to motors:: spinOnce (dx:%f, dr: %f)", self.dx,self.dr) 
+        rospy.loginfo("twist to motors:: spinOnce (self.left:%f,self.right %f)", self.left,self.right) 
+        
         self.pub_lmotor.publish(self.left)
         self.pub_rmotor.publish(self.right)
             
@@ -85,7 +85,7 @@ class TwistToMotors():
     #############################################################
     def twistCallback(self,msg):
     #############################################################
-        # rospy.loginfo("-D- twistCallback: %s" % str(msg))
+        #rospy.loginfo("twist to motors:: twistCallback raw msg: %s" % str(msg))
         self.ticks_since_target = 0
         self.dx = msg.linear.x
         self.dr = msg.angular.z

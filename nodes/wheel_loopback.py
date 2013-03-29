@@ -41,7 +41,7 @@ class WheelLoopback():
         
         self.rate = rospy.get_param("~rate", 200)
         self.timeout_secs = rospy.get_param("~timeout_secs", 0.5)
-        self.ticks_meter = float(rospy.get_param('~ticks_meter', 50))
+        self.ticks_meter = float(rospy.get_param('~ticks_meter', 0))
         self.velocity_scale = float(rospy.get_param('~velocity_scale', 255))
         self.latest_motor = 0
         
