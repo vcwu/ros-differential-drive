@@ -33,6 +33,23 @@ class PidVelocity():
 ######################################################
 ######################################################
 
+    """Map one range to another.
+       Taken from Adam Luchjenbroer's stack overflow answer.
+    """
+    #################################################
+    def translate(self, value, leftMin, leftMax, rightMin, rightMax):
+    #################################################
+        #Figure out how 'wide' each range is.
+        leftSpan = leftMax - leftMin
+        rightSpan = rightMax - rightMin
+
+        #Convert the left range into a 0 - 1 range (Float)
+        valueScaled = float(value - leftMin) / float(leftSpan)
+
+        #Convert the 0 -1 range into a value in the right range. 
+        #Round float to return an int.
+        answer =  rightMin + (valueScaled * rightSpan)
+        return int(round(answer))
 
     #####################################################
     def __init__(self):
@@ -68,6 +85,11 @@ class PidVelocity():
         self.vel_threshold = rospy.get_param('~vel_threshold', 0.001)
         self.encoder_min = rospy.get_param('encoder_min', -32768)
         self.encoder_max = rospy.get_param('encoder_max', 32768)
+      
+        ### get custom param - orig_motor_float ###
+        self.orig_motor_float_max = rospy.get_param('~orig_motor_float_max', 130)
+        self.orig_motor_float_min = rospy.get_param('~orig_motor_float_min', -130)
+		
         self.encoder_low_wrap = rospy.get_param('wheel_low_wrap', (self.encoder_max - self.encoder_min) * 0.3 + self.encoder_min )
         self.encoder_high_wrap = rospy.get_param('wheel_high_wrap', (self.encoder_max - self.encoder_min) * 0.7 + self.encoder_min )
         self.prev_vel = [0.0] * self.rolling_pts
@@ -78,7 +100,8 @@ class PidVelocity():
         #### subscribers/publishers 
         rospy.Subscriber("wheel", Int16, self.wheelCallback) 
         rospy.Subscriber("wheel_vtarget", Float32, self.targetCallback) 
-        self.pub_motor = rospy.Publisher('motor_cmd',Float32) 
+        #self.pub_motor = rospy.Publisher('motor_cmd',Float32) 
+        self.pub_motor = rospy.Publisher('motor_cmd', Int16)
         self.pub_vel = rospy.Publisher('wheel_vel', Float32)
    
         
@@ -172,9 +195,13 @@ class PidVelocity():
         # rospy.loginfo("i = i + (e * dt):  %0.3f = %0.3f + (%0.3f * %0.3f)" % (self.integral, self.integral, self.error, pid_dt))
         self.derivative = (self.error - self.previous_error) / pid_dt
         self.previous_error = self.error
-    
         self.motor = (self.Kp * self.error) + (self.Ki * self.integral) + (self.Kd * self.derivative)
-    
+
+		#Mapping self.motor to output a 16 bit signed int instead of 32bit float.
+		#Easier for Arduino to process.
+        self.motor = self.translate(self.motor, self.orig_motor_float_min, self.orig_motor_float_max, self.out_min, self.out_max)
+
+        rospy.loginfo("pid_velocity - self.motor: %f", self.motor)
         if self.motor > self.out_max:
             self.motor = self.out_max
             self.integral = self.integral - (self.error * pid_dt)
