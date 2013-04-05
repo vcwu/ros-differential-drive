@@ -136,7 +136,8 @@ class PidVelocity():
             self.ticks_since_target += 1
             if self.ticks_since_target == self.timeout_ticks:
                 self.pub_motor.publish(0)
-            
+        else:
+            self.pub_motor.publish(0)
     #####################################################
     def calcVelocity(self):
     #####################################################
