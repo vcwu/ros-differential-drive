@@ -19,8 +19,8 @@
 	  <rosparam param="encoder_max">255</rosparam>
 	  
 	  <!-- arbitrary power output to motors in min/max -->
-	  <rosparam param="out_min">-32768</rosparam>
-      <rosparam param="out_max">32767</rosparam>
+	  <rosparam param="out_min">-255</rosparam>
+      <rosparam param="out_max">255</rosparam>
 
 	  <!-- misc, rate of publication for mtr cmmnds -->
       <rosparam param="rate">30</rosparam> 
@@ -50,8 +50,8 @@
 	  <rosparam param="encoder_max">255</rosparam>
 
 	  <!-- arbitrary power output to motors in min/max -->
-	  <rosparam param="out_min">-32768</rosparam>
-      <rosparam param="out_max">32767</rosparam>
+	  <rosparam param="out_min">-255</rosparam>
+      <rosparam param="out_max">255</rosparam>
 
 	  <!-- misc, rate of publication for mtr cmmnds -->
       <rosparam param="rate">30</rosparam>
